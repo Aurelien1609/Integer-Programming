@@ -8,10 +8,15 @@
 
 using namespace std;
 
-#include <iostream>
 #include <stdio.h>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iterator>
+
+
 
 
 struct Node {
@@ -24,17 +29,41 @@ struct Node {
 int main(int argc, const char * argv[]) {
 
     
+    int capacity;
+    int nbObj;
+    vector<int> profits;
+    vector<int> weights;
     
+    ifstream fichier{"/Users/Aurelien/Desktop/Integer Programming/Integer Programming/instance1.txt"};
+    
+    string line;
+    getline(fichier,line);
+    capacity = atoi(line.c_str());
+    getline(fichier,line);
+    nbObj = atoi(line.c_str());
+    while (getline(fichier,line))
+    {
+        std::istringstream buf(line);
+        std::istream_iterator<std::string> beg(buf), end;
+        std::vector<std::string> tokens(beg, end);
+        
+        profits.push_back(atoi(tokens[0].c_str()));
+        weights.push_back(atoi(tokens[1].c_str()));
 
-    int nbObj = 4;
+    }
     
-    int capacity = 4;
-    vector<int> profits = {2,1,3,2};
-    vector<int> weights = {2,3,4,2};
+//    int nbObj = 4;
+//    int capacity = 4;
+//    
+//    vector<int> profits = {2,1,3,2};
+//    vector<int> weights = {2,3,4,2};
     
-//    int capacity = 3;
-//    vector<int> profits = {4,5,10,3};
-//    vector<int> weights = {2,4,7,3};
+//    for (auto elt : profits) {
+//        cout << elt << endl;
+//    }
+//    for (auto elt : weights) {
+//        cout << elt << endl;
+//    }
 
     int nbNodes = (capacity + 1) * nbObj;
     vector<Node> listNodes(nbNodes);
@@ -71,7 +100,7 @@ int main(int argc, const char * argv[]) {
             //cout << "Création de : Objet (" << listNodes[position_1].object << "," << listNodes[position_1].weight << ")" << endl;
             
             //cout << listNodes[positionActive].profit << " vs " << listNodes[position_1].profit << endl;
-            if (listNodes[positionActive].profit > listNodes[position_1].profit) {
+            if (listNodes[positionActive].profit >= listNodes[position_1].profit) {
                 listNodes[position_1].profit = listNodes[positionActive].profit;
                 listNodes[position_1].posBest = positionActive;
             }
@@ -84,7 +113,7 @@ int main(int argc, const char * argv[]) {
                 
                 //cout << "Création de : Objet (" << listNodes[position_2].object << "," << listNodes[position_2].weight << ")" << endl;
 
-                if (listNodes[positionActive].profit + profit > listNodes[position_2].profit) {
+                if (listNodes[positionActive].profit + profit >= listNodes[position_2].profit) {
                     listNodes[position_2].profit = profit + listNodes[positionActive].profit;
                     listNodes[position_2].posBest = positionActive;
 
@@ -99,11 +128,11 @@ int main(int argc, const char * argv[]) {
         
     }
     
-    cout << "-------------" << endl;
-    for (auto elt : listNodes) {
-        
-        cout << "Objet (" << elt.object << "," << elt.weight << ")" << " avec profit de : " << elt.profit << endl;
-    }
+//    cout << "-------------" << endl;
+//    for (auto elt : listNodes) {
+//        
+//        cout << "Objet (" << elt.object << "," << elt.weight << ")" << " avec profit de : " << elt.profit << endl;
+//    }
     
     Node bestNode = listNodes[0];
     for (int i = (capacity+1) * (nbObj-1); i < listNodes.size(); i++) {
@@ -111,19 +140,24 @@ int main(int argc, const char * argv[]) {
             bestNode = listNodes[i];
         }
     }
-    cout << "-------------" << endl;
+//    cout << "-------------" << endl;
     cout << "Best node (" << bestNode.object << "," << bestNode.weight << ")" << " avec profit de : " << bestNode.profit << endl;
     
     int position = bestNode.posBest;
     int profit = bestNode.profit;
-    for (int i = 0; i < nbObj - 1; i++) {
+    vector<bool> result;
+    for (int i = 0; i < nbObj; i++) {
         
         if (profit > listNodes[position].profit) {
-            cout << "Je prend objet : " << listNodes[position].object + 1 << endl;
+            //cout << "Je prend objet : " << listNodes[position].object + 1 << endl;
+            result.insert(result.begin(), true);
+
         }
         
         else {
-            cout << "Je prend pas objet : " << listNodes[position].object + 1 << endl;
+            //cout << "Je prend pas objet : " << listNodes[position].object + 1 << endl;
+            result.insert(result.begin(), false);
+
 
         }
         
@@ -131,16 +165,24 @@ int main(int argc, const char * argv[]) {
         position = listNodes[position].posBest;
     }
     
-    if (profit > listNodes[position].profit) {
-        cout << "Je prend objet : " << listNodes[position].object << endl;
+//    if (profit > listNodes[position].profit) {
+//        cout << "Je prend objet : " << listNodes[position].object << endl;
+//        result.insert(result.begin(), true);
+//
+//
+//    }
+//    
+//    else {
+//        cout << "Je prend pas objet : " << listNodes[position].object << endl;
+//        result.insert(result.begin(), false);
+//
+//    }
+    
+    for (auto elt : result) {
+        cout << elt;
     }
-    
-    else {
-        cout << "Je prend pas objet : " << listNodes[position].object << endl;
-        
-    }
-    
-    
+    cout << endl;
+
     
     return 0;
 }
